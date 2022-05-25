@@ -24,9 +24,15 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 
 
 class VoeResolver(ResolveUrl):
+<<<<<<< HEAD
     name = 'Voe'
     domains = ['voe.sx', 'voe-unblock.com', 'voe-unblock.net', 'voeunblock.com']
     pattern = r'(?://|\.)(voe(?:-?unblock)?\.(?:sx|com|net))/(?:e/)?([0-9A-Za-z]+)'
+=======
+    name = "Voe"
+    domains = ["voe.sx", "voe-unblock.com"]
+    pattern = r'(?://|\.)(voe(?:-unblock)?\.(?:sx|com))/(?:e/)?([0-9A-Za-z]+)'
+>>>>>>> parent of 20306c0 (Update VOE Hoster)
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
