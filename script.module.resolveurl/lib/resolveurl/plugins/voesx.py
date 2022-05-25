@@ -32,6 +32,9 @@ class VoeResolver(ResolveUrl):
     name = "Voe"
     domains = ["voe.sx", "voe-unblock.com"]
     pattern = r'(?://|\.)(voe(?:-unblock)?\.(?:sx|com))/(?:e/)?([0-9A-Za-z]+)'
+<<<<<<< HEAD
+>>>>>>> parent of 20306c0 (Update VOE Hoster)
+=======
 >>>>>>> parent of 20306c0 (Update VOE Hoster)
 
     def get_media_url(self, host, media_id):
