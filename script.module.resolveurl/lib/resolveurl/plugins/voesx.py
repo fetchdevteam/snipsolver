@@ -25,7 +25,7 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 
 class VoeResolver(ResolveUrl):
     name = 'Voe'
-    domains = ['voe.sx', 'voe-unblock.com', 'voe-unblock.net', 'voeunblock.com', 'voeunblock1.com']
+    domains = ['voe.sx', 'voe-unblock.com', 'voe-unblock.net', 'voeunblock.com', 'voeunblock1.com', 'voeunblock2.com']
     pattern = r'(?://|\.)(voe(?:-?unblock\d?)?\.(?:sx|com|net))/(?:e/)?([0-9A-Za-z]+)'
 
     def get_media_url(self, host, media_id):
