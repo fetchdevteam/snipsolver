@@ -1,7 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2016 script.module.resolveurl
-    Copyright (C) 2022 shellc0de
+    Copyright (C) 2022 shellc0de, gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -10,11 +9,11 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
@@ -27,7 +26,7 @@ class MyCloudResolver(ResolveGeneric):
 
     def get_url(self, host, media_id):
         media_id = mc_encode(media_id)
-        return self._default_get_url(host, media_id, template='https://{host}/info/{media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/mediainfo/{media_id}?key=vWal9S52iJwMql9q')
 
 
 def mc_encode(media_id):
@@ -36,8 +35,8 @@ def mc_encode(media_id):
 
     def encode2x(mstr):
         # Thanks to https://github.com/mbebe for the encode2x function
-        STANDARD_ALPHABET = six.ensure_binary('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=')
-        CUSTOM_ALPHABET = six.ensure_binary('0wMrYU+ixjJ4QdzgfN2HlyIVAt3sBOZnCT9Lm7uFDovkb/EaKpRWhqXS5168ePcG=')
+        STANDARD_ALPHABET = six.ensure_binary('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/')
+        CUSTOM_ALPHABET = six.ensure_binary('51wJ0FDq/UVCefLopEcmK3ni4WIQztMjZdSYOsbHr9R2h7PvxBGAuglaN8+kXT6y')
         if six.PY2:
             import string
             ENCODE_TRANSx = string.maketrans(STANDARD_ALPHABET, CUSTOM_ALPHABET)
@@ -47,7 +46,7 @@ def mc_encode(media_id):
         return base64.b64encode(mstr).translate(ENCODE_TRANSx)
 
     media_id = encode2x(media_id)
-    key = 'LCbu3iYC7ln24K7P'
+    key = 'HNYnH8K4qERdSq7u'
 
     f_list = list(range(256))
     k = 0
