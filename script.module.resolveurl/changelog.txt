@@ -1,4 +1,14 @@
-Version 5.1.69 (June 2, 2022)
+Nightly Version from xStream Team
+
+5.1.70~nightly2
+- Merge from Guial00 release (#126)
+
+5.1.70~nightly1
+- Update VOE Domain
+
+-----------------------------------------------------------------
+
+Release Version 5.1.69 (June 2, 2022)
 - Code Base Changes:
     - option to cleanup defunct resolvers from settings
     - remove numpy usage
