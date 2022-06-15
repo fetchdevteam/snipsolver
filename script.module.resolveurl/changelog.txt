@@ -1,5 +1,8 @@
 Nightly Version from xStream Team
 
+5.1.70~nightly4
+- Merge from Guial00 release (#133)
+
 5.1.70~nightly3
 - [VOE] Fix Domain
 
@@ -11,7 +14,7 @@ Nightly Version from xStream Team
 
 -----------------------------------------------------------------
 
-Release Version 5.1.69 (June 2, 2022)
+Version 5.1.69 (June 2, 2022)
 - Code Base Changes:
     - option to cleanup defunct resolvers from settings
     - remove numpy usage
