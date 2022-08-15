@@ -62,6 +62,11 @@ def get_ua():
     return user_agent
 
 
+class NoRedirection(urllib_request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 class Net:
     """
     This class wraps :mod:`urllib2` and provides an easy way to make http
