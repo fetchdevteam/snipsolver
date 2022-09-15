@@ -30,8 +30,8 @@ class VoeResolver(ResolveUrl):
                'voeun-block.net', 'un-block-voe.net', 'v-o-e-unblock.com',
                'audaciousdefaulthouse.com', 'launchreliantcleaverriver.com',
                'reputationsheriffkennethsand.com', 'fittingcentermondaysunday.com',
-               'housecardsummerbutton.com', 'fraudclatterflyingcar.com', 'bigclatterhomesguideservice.com', 
-               'uptodatefinishconferenceroom.com', 'realfinanceblogcenter.com']
+               'housecardsummerbutton.com', 'fraudclatterflyingcar.com', 'bigclatterhomesguideservice.com', 'uptodatefinishconferenceroom.com'
+               'realfinanceblogcenter.com']
     domains += ['voeunblock{}.com'.format(x) for x in range(1, 11)]
     pattern = r'(?://|\.)((?:audaciousdefaulthouse|launchreliantcleaverriver|' \
               r'reputationsheriffkennethsand|fittingcentermondaysunday|' \

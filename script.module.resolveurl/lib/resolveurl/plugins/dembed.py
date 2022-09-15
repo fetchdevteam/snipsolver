@@ -44,7 +44,11 @@ class DembedResolver(ResolveUrl):
         if response:
             result = self._decrypt(response)
             result = json.loads(result)
-            str_url = result.get('source')[0].get('file') or result.get('source_bk')[0].get('file')
+            str_url = ''
+            if len(result.get('source')) > 0:
+                str_url = result.get('source')[0].get('file')
+            if not str_url and len(result.get('source_bk')) > 0:
+                str_url = result.get('source_bk')[0].get('file')
             if str_url:
                 headers.pop('X-Requested-With')
                 return str_url + helpers.append_headers(headers)
