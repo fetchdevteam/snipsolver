@@ -1,7 +1,7 @@
 Nightly Version from xStream Team
 
-5.1.76~nightly2
-- VOE Fix neue Domain
+5.1.77~nightly1
+- Filemoon fix
 
 5.1.76~nightly1
 - VOE Fix neue Domain
