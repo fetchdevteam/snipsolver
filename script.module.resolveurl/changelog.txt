@@ -1,5 +1,8 @@
 Nightly Version from xStream Team
 
+5.1.77~nightly2
+- Merge from Guial00 release (#207)
+
 5.1.77~nightly1
 - Filemoon fix
 
