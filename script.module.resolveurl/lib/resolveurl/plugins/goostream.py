@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2021 gujal
+    Copyright (C) 2022 shellc0de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,9 @@
 """
 
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
-from resolveurl.lib import helpers
 
 
-class VidMXResolver(ResolveGeneric):
-    name = 'VidMX'
-    domains = ['vidmx.xyz', 'vembx.one']
-    pattern = r'(?://|\.)((?:vidmx|vembx)\.(?:xyz|one))/(?:embed-)?([0-9a-zA-Z]+)'
-
-    def get_media_url(self, host, media_id):
-        return helpers.get_media_url(
-            self.get_url(host, media_id),
-            patterns=[r'''{file:"(?P<url>[^"]+)",label:"(?P<label>[^"]+)"'''],
-            generic_patterns=False,
-            referer=False
-        )
+class GooStreamResolver(ResolveGeneric):
+    name = 'GooStream'
+    domains = ['goostream.net']
+    pattern = r'(?://|\.)(goostream\.net)/(?:embed-|e/|d/)?([0-9a-zA-Z]+)'
