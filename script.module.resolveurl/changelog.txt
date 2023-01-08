@@ -1,5 +1,8 @@
 Nightly Version from xStream Team
 
+5.1.88~nightly3
+- Merge from Guial00 release (#297)
+
 5.1.88~nightly2
 - Merge from Guial00 release (#294)
 
