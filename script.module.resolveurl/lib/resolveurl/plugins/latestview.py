@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (c) 2023 gujal
+    Copyright (C) 2023 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,27 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
-from resolveurl import common
+import json
 from resolveurl.lib import helpers
+from resolveurl import common
 from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class ArchiveResolver(ResolveUrl):
-    name = 'Archive'
-    domains = ['archive.org']
-    pattern = r'(?://|\.)(archive\.org)/embed/([0-9a-zA-Z-_\.]+)'
+class LatestViewResolver(ResolveUrl):
+    name = 'LatestView'
+    domains = ['latestview.co']
+    pattern = r'(?://|\.)(latestview\.co)/video/([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.FF_USER_AGENT}
-        html = self.net.http_GET(web_url, headers=headers).content
-        sources = re.findall(r'"file":"(?P<url>[^"]+)[^}]+?label":"(?P<label>[\d]+p?)', html)
-        if sources:
-            sources = [(x[1], x[0]) for x in sources]
-            surl = 'https://' + host + helpers.pick_source(helpers.sort_sources_list(sources)).replace('/download/', '/serve/').replace(' ', '%20')
-            return surl + helpers.append_headers(headers)
-        raise ResolverError('Video Link Not Found')
+        headers = {'User-Agent': common.FF_USER_AGENT,
+                   'X-Requested-With': 'XMLHttpRequest'}
+        pdata = {'hash': media_id,
+                 'r': 'https://{0}/'.format(host)}
+        resp = json.loads(self.net.http_POST(web_url, form_data=pdata, headers=headers).content)
+        str_url = resp.get('videoSource')
+        if str_url:
+            headers.pop('X-Requested-With')
+            return str_url + helpers.append_headers(headers)
+        raise ResolverError('Video not found')
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/embed/{media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/player/index.php?data={media_id}&do=getVideo')

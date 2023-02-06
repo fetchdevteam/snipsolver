@@ -43,7 +43,8 @@ class Streama2zResolver(ResolveUrl):
             'referer': rurl
         }
         html = self.net.http_POST(web_url, form_data=payload, headers=headers).content
-        source = re.search(r'''sources:\s*\[{src:\s*["']([^"']+)''', html)
+        html += helpers.get_packed_data(html)
+        source = re.search(r'''sources:\s*\[{\s*src:\s*["']([^"']+)''', html)
         if source:
             return source.group(1) + helpers.append_headers(headers)
 
