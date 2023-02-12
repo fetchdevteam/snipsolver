@@ -1,5 +1,8 @@
 Nightly Version from xStream Team
 
+5.1.92~nightly3
+- VOE Domain Fix
+
 5.1.92~nightly2
 - Merge from Guial00 release (11/02/23)
 
