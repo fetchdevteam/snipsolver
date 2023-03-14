@@ -1,5 +1,10 @@
 Nightly Version from xStream Team
 
+5.1.96~nightly1
+- Merge from Guial00 release (14/03/23)
+- Streamembed fixed
+- Streamsb fixed
+
 5.1.95~nightly1
 - Merge from Guial00 release (12/03/23)
 
