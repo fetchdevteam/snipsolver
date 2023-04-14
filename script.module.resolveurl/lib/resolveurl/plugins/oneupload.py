@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2022 shellc0de
+    Copyright (C) 2023 shellc0de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,18 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from resolveurl.lib import helpers
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
 
 
-class WatchingVnResolver(ResolveGeneric):
-    name = 'WatchingVn'
-    domains = ['watching.vn']
-    pattern = r'(?://|\.)(watching\.vn)/(?:embed-|e/|d/)?([0-9a-zA-Z]+)'
-
-    def get_media_url(self, host, media_id):
-        return helpers.get_media_url(
-            self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{src:\s*["'](?P<url>[^"']+)'''],
-            generic_patterns=False
-        )
+class OneUploadResolver(ResolveGeneric):
+    name = 'OneUpload'
+    domains = ['oneupload.to']

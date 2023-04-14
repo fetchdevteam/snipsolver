@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2020 cywteow
+    Copyright (C) 2023 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,12 +17,20 @@
 """
 
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
+from resolveurl.lib import helpers
 
 
-class GoGoStreamResolver(ResolveGeneric):
-    name = 'GoGoStream'
-    domains = ['gogo-play.net']
-    pattern = r'(?://|\.)(gogo-play\.net)/(?:streaming|embed|load|ajax)\.php\?id=([a-zA-Z0-9]+)'
+class VidSpeedResolver(ResolveGeneric):
+    name = 'VidSpeed'
+    domains = ['vidspeed.cc']
+    pattern = r'(?://|\.)(vidspeed\.cc)/(?:embed-)?([0-9a-zA-Z]+)'
+
+    def get_media_url(self, host, media_id):
+        return helpers.get_media_url(
+            self.get_url(host, media_id),
+            patterns=[r'''file:\s*"(?P<url>[^"]+)'''],
+            referer=False
+        )
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/ajax.php?id={media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/embed-{media_id}.html')
