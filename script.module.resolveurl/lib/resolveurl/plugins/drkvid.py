@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2022 shellc0de
+    Copyright (C) 2023 peter
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,24 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from resolveurl.lib import helpers
+
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
+from resolveurl.lib import helpers
 
 
-class StreamHideResolver(ResolveGeneric):
-    name = 'StreamHide'
-    domains = ['streamhide.to', 'guccihide.com', 'moviesm4u.com', 'movhide.pro', 'streamhide.com',
-               'louishide.com', 'ahvsh.com', 'javb1.com', 'bikurathulw.sbs']
-    pattern = r'(?://|\.)((?:moviesm4u|ahvsh|(?:stream|gucci|mov|louis)hide|javb1|bikurathulw)\.(?:to|com|pro|sbs))/' \
-              r'(?:e|d|w)/([0-9a-zA-Z]+)'
+class DrkVidResolver(ResolveGeneric):
+    name = 'drkvid'
+    domains = ['drkvid.site']
+    pattern = r'(?://|\.)(.*?\.drkvid\.site)/(?:embed-|play/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         return helpers.get_media_url(
             self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{file:\s*["'](?P<url>[^"']+)'''],
-            generic_patterns=False,
-            referer=False
+            patterns=[r'''sources:\s*\[(?:{file:)?\s*"(?P<url>[^"]+)'''],
+            generic_patterns=False
+            
         )
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/e/{media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/embed-{media_id}.html')
