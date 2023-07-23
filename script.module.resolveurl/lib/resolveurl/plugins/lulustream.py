@@ -20,13 +20,10 @@ from resolveurl.lib import helpers
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
 
 
-class StreamWishResolver(ResolveGeneric):
-    name = 'StreamWish'
-    domains = ['streamwish.com', 'streamwish.to', 'ajmidyad.sbs', 'khadhnayad.sbs', 'yadmalik.sbs',
-               'hayaatieadhab.sbs', 'kharabnahs.sbs', 'atabkhha.sbs', 'atabknha.sbs', 'atabknhk.sbs', 'atabknhs.sbs']
-    pattern = r'(?://|\.)((?:streamwish|ajmidyad|khadhnayad|yadmalik|hayaatieadhab|kharabnahs|' \
-              r'atabkhha|atabknha|atabknhk|atabknhs)' \
-              r'\.(?:com|to|sbs))/(?:e/|f/)?([0-9a-zA-Z]+)'
+class LuluStreamResolver(ResolveGeneric):
+    name = 'LuluStream'
+    domains = ['lulustream.com']
+    pattern = r'(?://|\.)(lulustream\.com)/(?:e/|d/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         return helpers.get_media_url(
