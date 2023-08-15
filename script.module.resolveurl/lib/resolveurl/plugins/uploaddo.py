@@ -20,22 +20,14 @@ from resolveurl.lib import helpers
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
 
 
-class FileLionsResolver(ResolveGeneric):
-    name = 'FileLions'
-    domains = ['filelions.com', 'filelions.to', 'ajmidyadfihayh.sbs', 'alhayabambi.sbs', 'techradar.ink',
-               'moflix-stream.click', 'azipcdn.com', 'mlions.pro', 'alions.pro', 'dlions.pro',
-               'filelions.live','motvy55.store']
-    pattern = r'(?://|\.)((?:filelions|ajmidyadfihayh|alhayabambi|techradar|moflix-stream|azipcdn|motvy55|' \
-              r'[mad]lions)\.' \
-              r'(?:com|to|sbs|ink|click|pro|live|store))/(?:v|f|d)/([0-9a-zA-Z]+)'
+class UploadDoResolver(ResolveGeneric):
+    name = 'UploadDo'
+    domains = ['upload.do']
+    pattern = r'(?://|\.)(upload\.do)/(?:embed-|e/|d/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         return helpers.get_media_url(
             self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{file:\s*["'](?P<url>[^"']+)'''],
-            generic_patterns=False,
-            referer=False
+            patterns=[r'''sources:\s*\[{src:\s*["'](?P<url>[^"']+)'''],
+            generic_patterns=False
         )
-
-    def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/v/{media_id}')
