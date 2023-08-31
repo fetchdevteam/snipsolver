@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2020 gujal
+    Copyright (C) 2023 bassemhelal18
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,21 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
 from resolveurl.lib import helpers
 
 
-class VidMolyResolver(ResolveGeneric):
-    name = 'VidMoly'
-    domains = ['vidmoly.me', 'vidmoly.to', 'vidmoly.net']
-    pattern = r'(?://|\.)(vidmoly\.(?:me|to|net))/(?:embed-|w/)?([0-9a-zA-Z]+)'
+class VidTubeResolver(ResolveGeneric):
+    name = 'VidTube'
+    domains = ['vidtube.pro', 'vidtube.cam']
+    pattern = r'(?://|\.)(.*?vidtube\.(?:pro|cam))/(?:embed-|d/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         return helpers.get_media_url(
             self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{file:"(?P<url>[^"]+)'''],
-            result_blacklist=['.mpd']
+            patterns=[r'''file:\s*"(?P<url>[^"]+)",label:\s*"(?P<label>[^"]+)"}''']
         )
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://vidmoly.net/{media_id}.html')
+        return self._default_get_url(host, media_id, template='https://{host}/embed-{media_id}.html')
