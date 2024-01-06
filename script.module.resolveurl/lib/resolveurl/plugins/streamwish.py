@@ -25,13 +25,16 @@ class StreamWishResolver(ResolveGeneric):
     name = 'StreamWish'
     domains = ['streamwish.com', 'streamwish.to', 'ajmidyad.sbs', 'khadhnayad.sbs', 'yadmalik.sbs',
                'hayaatieadhab.sbs', 'kharabnahs.sbs', 'atabkhha.sbs', 'atabknha.sbs', 'atabknhk.sbs',
-               'atabknhs.sbs', 'abkrzkr.sbs', 'abkrzkz.sbs', 'wishembed.pro', 'mwish.pro',
+               'atabknhs.sbs', 'abkrzkr.sbs', 'abkrzkz.sbs', 'wishembed.pro', 'mwish.pro', 'strmwis.xyz',
                'awish.pro', 'dwish.pro', 'vidmoviesb.xyz', 'embedwish.com', 'cilootv.store',
-               'tuktukcinema.store', 'doodporn.xyz', 'ankrzkz.sbs','volvovideo.top', 'streamwish.site']
-    pattern = r'(?://|\.)((?:streamwish|ajmidyad|khadhnayad|yadmalik|hayaatieadhab|kharabnahs|' \
-              r'atabkhha|atabknha|atabknhk|atabknhs|abkrzkr|abkrzkz|wishembed|[mad]wish|vidmoviesb|' \
-              r'cilootv|tuktukcinema|embedwish|doodporn|ankrzkz|volvovideo)' \
-              r'\.(?:com|to|sbs|pro|xyz|store|top|site))/(?:e/|f/)?([0-9a-zA-Z$:/.]+)'
+               'tuktukcinema.store', 'doodporn.xyz', 'ankrzkz.sbs', 'volvovideo.top', 'streamwish.site',
+               'wishfast.top', 'ankrznm.sbs', 'sfastwish.com', 'eghjrutf.sbs', 'eghzrutw.sbs',
+               'playembed.online', 'egsyxurh.sbs', 'egtpgrvh.sbs', 'flaswish.com', 'obeywish.com']
+    pattern = r'(?://|\.)((?:(?:stream|flas|obey|sfast|embed|[mad])?wish(?:embed|fast)?|ajmidyad|' \
+              r'atabkhha|atabknha|atabknhk|atabknhs|abkrzkr|abkrzkz|vidmoviesb|kharabnahs|hayaatieadhab|' \
+              r'cilootv|tuktukcinema|doodporn|ankrzkz|volvovideo|strmwis|ankrznm|yadmalik|khadhnayad|' \
+              r'eghjrutf|eghzrutw|playembed|egsyxurh|egtpgrvh)' \
+              r'\.(?:com|to|sbs|pro|xyz|store|top|site|online))/(?:e/|f/)?([0-9a-zA-Z$:/.]+)'
 
     def get_media_url(self, host, media_id):
         if '$$' in media_id:

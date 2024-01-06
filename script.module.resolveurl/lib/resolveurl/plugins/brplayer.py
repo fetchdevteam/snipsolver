@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2016 gujal
+    Copyright (C) 2023 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,27 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
 from resolveurl.lib import helpers
+import re
 from resolveurl import common
 from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class GamoVideoResolver(ResolveUrl):
-    name = 'GamoVideo'
-    domains = ['gamovideo.com']
-    pattern = r'(?://|\.)(gamovideo\.com)/(?:embed-)?([0-9a-zA-Z]+)'
+class BRPlayerResolver(ResolveUrl):
+    name = 'BRPlayer'
+    domains = ['brplayer.site']
+    pattern = r'(?://|\.)(watch\.brplayer\.site)/watch\?v=([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.CHROME_USER_AGENT}
+        headers = {'User-Agent': common.FF_USER_AGENT}
         html = self.net.http_GET(web_url, headers=headers).content
-        html += helpers.get_packed_data(html)
-        source = re.search(r'''file:\s*["'](?P<url>http[^"']+)["']''', html)
-        if source:
-            return source.group(1) + helpers.append_headers(headers)
-
-        raise ResolverError('Video not found')
+        r = re.search(r'sniff\("[^"]+","([^"]+)","([^"]+)".+?],([^,]+)', html)
+        if r:
+            source = "https://{0}/m3u8/{1}/{2}/master.txt?s=1&cache={3}".format(
+                host, r.group(1), r.group(2), r.group(3)
+            )
+            headers.update({'Referer': web_url})
+            return source + helpers.append_headers(headers)
+        raise ResolverError('Video Link Not Found')
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='http://{host}/{media_id}')
+        return self._default_get_url(host, media_id, 'https://{host}/watch?v={media_id}')

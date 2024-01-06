@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2023 gujal
+    Copyright (C) 2023 shellc0de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,24 +17,12 @@
 """
 
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
-from resolveurl.lib import helpers
 
 
-class VemBXResolver(ResolveGeneric):
-    name = 'VemBX'
-    domains = ['vembx.one', 'embed.icu', 'vidplay.one']
-    pattern = r'(?://|\.)((?:vembx|embed|vidplay)\.(?:one|icu))/(?:x?embed*(?:\d|vip)?-)?([0-9a-zA-Z]+)'
-
-    def get_media_url(self, host, media_id):
-        return helpers.get_media_url(
-            self.get_url(host, media_id),
-            patterns=[
-                r'''file:"(?P<url>[^"]+)",label:"(?P<label>[^"]+)"''',
-                r'''{file:"(?P<url>[^"]+)"}'''
-            ],
-            generic_patterns=False,
-            referer=False
-        )
+class StreamDavResolver(ResolveGeneric):
+    name = 'StreamDav'
+    domains = ['streamdav.com']
+    pattern = r'(?://|\.)(streamdav\.com)/(?:e|f|v)/([0-9a-zA-Z]+)'
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/embed-{media_id}.html')
+        return self._default_get_url(host, media_id, template='https://{host}/e/{media_id}')

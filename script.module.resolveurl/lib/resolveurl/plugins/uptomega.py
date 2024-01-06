@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2021 shellc0de
+    Copyright (C) 2024 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,21 +17,9 @@
 """
 
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
-from resolveurl.lib import helpers
 
 
-class StreamHubResolver(ResolveGeneric):
-    name = 'StreamHub'
-    domains = ['streamhub.to', 'streamhub.gg', 'streamhub.ink', 'streamhub.top']
-    pattern = r'(?://|\.)(streamhub\.(?:top?|gg|ink))/(?:embed-|e/|d/)?([0-9a-zA-Z]+)'
-
-    def get_media_url(self, host, media_id):
-        return helpers.get_media_url(
-            self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[(?:{src:)?\s*"(?P<url>[^"]+)'''],
-            generic_patterns=False,
-            referer=False
-        )
-
-    def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/e/{media_id}')
+class UptoMegaResolver(ResolveGeneric):
+    name = 'UptoMega'
+    domains = ['uptomega.net']
+    pattern = r'(?://|\.)(uptomega\.net)/(?:embed-)?([0-9a-zA-Z]+)'

@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2015 tknorris
+    Copyright (C) 2024 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,35 +26,28 @@ from six.moves import urllib_parse
 MAX_TRIES = 3
 
 
-class ClickNUploadResolver(ResolveUrl):
-    name = 'ClickNUpload'
-    domains = ['clicknupload.to', 'clicknupload.cc', 'clicknupload.co', 'clicknupload.com',
-               'clicknupload.me', 'clicknupload.link', 'clicknupload.red', 'clicknupload.org',
-               'clicknupload.club', 'clicknupload.click', 'clicknupload.download',
-               'clicknupload.vip', 'clickndownload.org']
-    pattern = r'(?://|\.)(clickn(?:up|down)load\.(?:com?|me|link|org|cc|club|to|red|click|download|vip))/(?:f/)?([0-9A-Za-z]+)'
+class FreeDLResolver(ResolveUrl):
+    name = 'FreeDL'
+    domains = ['frdl.to', 'freedl.ink']
+    pattern = r'(?://|\.)(fre*dl\.(?:ink|to))/([0-9A-Za-z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.FF_USER_AGENT,
                    'Referer': web_url}
-        r = self.net.http_GET(web_url, headers=headers)
-        if web_url != r.get_url():
-            web_url = r.get_url()
-        html = r.content
+        html = self.net.http_GET(web_url, headers=headers).content
         if 'File Not Found' not in html:
             tries = 0
             while tries < MAX_TRIES:
                 data = helpers.get_hidden(html)
                 data.update(captcha_lib.do_captcha(html))
-                common.kodi.sleep(3000)
+                common.kodi.sleep(31000)
                 html = self.net.http_POST(web_url, data, headers=headers).content
-                r = re.search(r'''class="downloadbtn"[^>]+onClick\s*=\s*\"window\.open\('(.+?)'\);"''', html)
+                r = re.search(r'class="done.+?href="([^"]+)', html, re.DOTALL)
                 if r:
-                    headers.update({'verifypeer': 'false'})
                     return urllib_parse.quote(r.group(1), '/:') + helpers.append_headers(headers)
 
-                common.kodi.sleep(12000)
+                common.kodi.sleep(4000)
                 tries = tries + 1
             raise ResolverError('Unable to locate link')
         else:
@@ -62,7 +55,7 @@ class ClickNUploadResolver(ResolveUrl):
         return
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://clicknupload.vip/{media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/{media_id}/')
 
     @classmethod
     def isPopup(self):
