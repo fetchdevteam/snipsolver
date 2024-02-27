@@ -30,7 +30,7 @@ class VoeResolver(ResolveUrl):
                'audaciousdefaulthouse.com', 'launchreliantcleaverriver.com', 'kennethofficialitem.com',
                'reputationsheriffkennethsand.com', 'fittingcentermondaysunday.com', 'lukecomparetwo.com',
                'housecardsummerbutton.com', 'fraudclatterflyingcar.com', 'wolfdyslectic.com',
-               'bigclatterhomesguideservice.com', 'uptodatefinishconferenceroom.com',
+               'bigclatterhomesguideservice.com', 'uptodatefinishconferenceroom.com', 'jayservicestuff.com',
                'realfinanceblogcenter.com', 'tinycat-voe-fashion.com', '35volitantplimsoles5.com',
                '20demidistance9elongations.com', 'telyn610zoanthropy.com', 'toxitabellaeatrebates306.com',
                'greaseball6eventual20.com', '745mingiestblissfully.com', '19turanosephantasia.com',
@@ -41,16 +41,16 @@ class VoeResolver(ResolveUrl):
                'metagnathtuggers.com', 'gamoneinterrupted.com', 'chromotypic.com', 'crownmakermacaronicism.com',
                'generatesnitrosate.com', 'yodelswartlike.com', 'figeterpiazine.com', 'strawberriesporail.com',
                'valeronevijao.com', 'timberwoodanotia.com', 'apinchcaseation.com', 'nectareousoverelate.com',
-               'nonesnanking.com', 'kathleenmemberhistory.com', 'stevenimaginelittle.com',
-               'bradleyviewdoctor.com']
+               'nonesnanking.com', 'kathleenmemberhistory.com', 'stevenimaginelittle.com', 'jamiesamewalk.com',
+               'bradleyviewdoctor.com', 'sandrataxeight.com']
     domains += ['voeunblock{}.com'.format(x) for x in range(1, 11)]
     pattern = r'(?://|\.)((?:audaciousdefaulthouse|launchreliantcleaverriver|kennethofficialitem|' \
               r'reputationsheriffkennethsand|fittingcentermondaysunday|paulkitchendark|' \
               r'housecardsummerbutton|fraudclatterflyingcar|35volitantplimsoles5.com|' \
               r'bigclatterhomesguideservice|uptodatefinishconferenceroom|edwardarriveoften|' \
               r'realfinanceblogcenter|tinycat-voe-fashion|20demidistance9elongations|' \
-              r'telyn610zoanthropy|toxitabellaeatrebates306|greaseball6eventual20|' \
-              r'745mingiestblissfully|19turanosephantasia|30sensualizeexpression|' \
+              r'telyn610zoanthropy|toxitabellaeatrebates306|greaseball6eventual20|jayservicestuff|' \
+              r'745mingiestblissfully|19turanosephantasia|30sensualizeexpression|sandrataxeight|' \
               r'321naturelikefurfuroid|449unceremoniousnasoseptal|guidon40hyporadius9|' \
               r'cyamidpulverulence530|boonlessbestselling244|antecoxalbobbing1010|lukecomparetwo|' \
               r'matriculant401merited|scatch176duplicities|availedsmallest|stevenimaginelittle|' \
@@ -58,25 +58,34 @@ class VoeResolver(ResolveUrl):
               r'metagnathtuggers|gamoneinterrupted|chromotypic|crownmakermacaronicism|' \
               r'yodelswartlike|figeterpiazine|strawberriesporail|valeronevijao|timberwoodanotia|' \
               r'generatesnitrosate|apinchcaseation|nonesnanking|kathleenmemberhistory|' \
-              r'bradleyviewdoctor|' \
+              r'jamiesamewalk|bradleyviewdoctor|' \
               r'(?:v-?o-?e)?(?:-?un-?bl[o0]?c?k\d{0,2})?(?:-?voe)?)\.(?:sx|com|net))/' \
               r'(?:e/)?([0-9A-Za-z]+)'
 
-    def get_media_url(self, host, media_id):
+    def get_media_url(self, host, media_id, subs=False):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.RAND_UA}
         html = self.net.http_GET(web_url, headers=headers).content
+        if subs:
+            subtitles = helpers.scrape_subtitles(html, web_url)
+
         r = re.search(r'uttf0\((\[[^)]+)', html)
         if r:
             r = eval(r.group(1))
             r = helpers.b64decode(''.join(r)[::-1])
-            return r + helpers.append_headers(headers)
+            stream_url = r + helpers.append_headers(headers)
+            if subs:
+                return stream_url, subtitles
+            return stream_url
 
-        r = re.search(r"let\s*wc0\s*=\s*'([^']+)", html)
+        r = re.search(r"let\s*(?:wc0|[0-9a-f]+)\s*=\s*'([^']+)", html)
         if r:
             import json
-            r = json.loads(helpers.b64decode(r.group(1)))
-            return r.get('file') + helpers.append_headers(headers)
+            r = json.loads(helpers.b64decode(r.group(1))[::-1])
+            stream_url = r.get('file') + helpers.append_headers(headers)
+            if subs:
+                return stream_url, subtitles
+            return stream_url
 
         sources = helpers.scrape_sources(
             html,
@@ -86,7 +95,10 @@ class VoeResolver(ResolveUrl):
             generic_patterns=False
         )
         if sources:
-            return helpers.pick_source(sources) + helpers.append_headers(headers)
+            stream_url = helpers.pick_source(sources) + helpers.append_headers(headers)
+            if subs:
+                return stream_url, subtitles
+            return stream_url
 
         raise ResolverError('No video found')
 
