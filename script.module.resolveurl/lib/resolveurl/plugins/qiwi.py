@@ -1,7 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2021 shellc0de
-                  2023 gujal
+    Copyright (C) 2024 peter3344
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,33 +16,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from six.moves import urllib_parse
+import re
 from resolveurl.lib import helpers
 from resolveurl import common
 from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class SendResolver(ResolveUrl):
-    name = 'Send'
-    domains = ['send.cm', 'sendit.cloud']
-    pattern = r'(?://|\.)(send(?:it)?\.(?:cm|cloud))/(?:f/embed/)?([0-9a-zA-Z]+)'
+class QiwiResolver(ResolveUrl):
+    name = 'Qiwi'
+    domains = ['qiwi.gg']
+    pattern = r'(?://|\.)(qiwi\.gg)/(?:file/)([^/\?]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.FF_USER_AGENT}
+        headers = {'User-Agent': common.FF_USER_AGENT,
+                   'Origin': 'https://{0}'.format(host),
+                   'Referer': web_url}
+
         html = self.net.http_GET(web_url, headers=headers).content
-        if "The file you were looking for doesn't exist." not in html:
-            data = helpers.get_hidden(html)
-            burl = 'https://{}'.format(host)
-            url = helpers.get_redirect_url(burl, headers=headers, form_data=data)
-            if url != burl:
-                headers.update({'Referer': web_url})
-                return urllib_parse.quote(url, '/:') + helpers.append_headers(headers)
-            else:
-                raise ResolverError('Unable to locate File')
-        else:
-            raise ResolverError('File deleted')
-        return
+
+        r = re.search(r'class="page_TextHeading__VsM7r">([^"]+)</h1>', html)
+        if r:
+            ext = r.group(1).split('.')[-1]
+            source = 'https://spyderrock.com/{0}.{1}'.format(media_id, ext)
+            return source + helpers.append_headers(headers)
+        raise ResolverError('File Not Found or removed')
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://send.cm/{media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/file/{media_id}')

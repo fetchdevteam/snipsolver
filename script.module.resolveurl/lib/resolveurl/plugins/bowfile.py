@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2023 gujal
+    Copyright (C) 2024 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,34 +22,26 @@ from resolveurl.lib import helpers
 from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class UpBaamResolver(ResolveUrl):
-    name = 'UpBaam'
-    domains = ['upbaam.com', 'cdnupbom.com', 'uupbom.com', 'upgobom.space', 'top15top.shop']
-    pattern = r'(?://|\.)((?:tgb\d*\.)?(?:(?:cdn)?u*pg?o?b[ao]*m|top15top)\.(?:com|space|shop))/([0-9a-zA-Z]+)'
+class BowFileResolver(ResolveUrl):
+    name = 'BowFile'
+    domains = ['bowfile.com']
+    pattern = r'(?://|\.)(bowfile\.com)/(?:video/embed/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
         headers = {
-            'Origin': 'https://{0}'.format(host),
             'Referer': web_url,
             'User-Agent': common.RAND_UA
         }
-        html = self.net.http_GET(web_url, headers=headers).content
-        payload = helpers.get_hidden(html)
-        payload.update({"method_free": "Free Download >>"})
-        url = self.net.http_POST(web_url, form_data=payload, headers=headers, redirect=False).get_redirect_url()
-        if url and url != web_url:
-            return url.replace(' ', '%20') + helpers.append_headers(headers)
-        payload = {
-            'op': 'download2',
-            'id2': media_id,
-            'rand': '',
-            'referer': web_url
-        }
-        html = self.net.http_POST(web_url, form_data=payload, headers=headers).content
-        url = re.search(r'direct_link".+?>\s*<a\s*href="([^"]+)', html)
-        if url:
-            return url.group(1).replace(' ', '%20') + helpers.append_headers(headers)
+        response = self.net.http_GET(web_url, headers=headers)
+        dl_url = re.search(r'let\s*next\s*=\s*"([^"]+)', response.content)
+        cookie = response.get_headers(as_dict=True).get('Set-Cookie', '')
+        if dl_url:
+            headers.update({'Cookie': cookie.split(';')[0]})
+            common.kodi.sleep(10000)
+            url = self.net.http_GET(dl_url.group(1), headers=headers, redirect=False).get_redirect_url()
+            if url and url != web_url:
+                return url.replace(' ', '%20') + helpers.append_headers(headers)
 
         raise ResolverError('File Not Found or Removed')
 

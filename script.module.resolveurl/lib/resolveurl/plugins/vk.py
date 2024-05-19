@@ -27,24 +27,40 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 class VKResolver(ResolveUrl):
     name = 'VK'
     domains = ['vk.com']
-    pattern = r'(?://|\.)(vk\.com)/(?:video_ext\.php\?|video)(.+)'
+    pattern = r'(?://|\.)(vk\.com)/(?:video_ext\.php\?)?(.+)'
 
     def get_media_url(self, host, media_id):
         headers = {'User-Agent': common.EDGE_USER_AGENT,
                    'Referer': 'https://vk.com/',
                    'Origin': 'https://vk.com'}
 
-        query = urllib_parse.parse_qs(media_id)
-
         try:
+            query = urllib_parse.parse_qs(media_id)
             oid, video_id = query['oid'][0], query['id'][0]
         except:
             oid, video_id = re.findall('(.*)_(.*)', media_id)[0]
 
-        sources = self.__get_sources(oid, video_id, headers)
-        if sources:
-            sources.sort(key=lambda x: int(x[0]), reverse=True)
-            source = helpers.pick_source(sources)
+        if 'doc/' not in media_id and not media_id.startswith('doc'):
+            oid = oid.replace('video', '')
+            sources = self.__get_sources(oid, video_id, headers)
+            if sources:
+                sources.sort(key=lambda x: int(x[0]), reverse=True)
+                source = helpers.pick_source(sources)
+                if source:
+                    headers.pop('X-Requested-With')
+                    return source + helpers.append_headers(headers)
+
+        html = self.net.http_GET(self.get_url(host, media_id), headers=headers).content
+        if 'doc/' in media_id or media_id.startswith('doc'):
+            jd = re.search(r'Docs\.initDoc\(({.+?})\)', html)
+        else:
+            jd = re.search(r'var\s*playerParams\s*=\s*(.+?});', html)
+        if jd:
+            jd = json.loads(jd.group(1))
+            if 'doc/' in media_id or media_id.startswith('doc'):
+                source = jd.get('docUrl')
+            else:
+                source = jd.get('params')[0].get('hls')
             if source:
                 return source + helpers.append_headers(headers)
 
@@ -76,9 +92,15 @@ class VKResolver(ResolveUrl):
                 if item.startswith('url'):
                     sources.append((item[3:], js_data.get(item)))
             if not sources:
-                sources = [('360', js_data.get('hls'))]
-            return sources
-        raise ResolverError('No video found')
+                str_url = js_data.get('hls')
+                if str_url:
+                    sources = [('360', str_url)]
+        return sources
 
     def get_url(self, host, media_id):
-        return 'https://vk.com/video_ext.php?%s' % (media_id)
+        if 'doc/' in media_id or media_id.startswith('doc'):
+            url = 'https://vk.com/%s' % (media_id)
+        else:
+            media_id = media_id.replace('video', '')
+            url = 'https://vk.com/video_ext.php?%s' % (media_id)
+        return url

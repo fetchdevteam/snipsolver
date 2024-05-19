@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2019 gujal
+    Copyright (C) 2024 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,31 +17,36 @@
 """
 
 import re
+from six.moves import urllib_parse
 from resolveurl.lib import helpers
+from resolveurl.lib import captcha_lib
 from resolveurl import common
 from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class StreamZResolver(ResolveUrl):
-    name = 'StreamZ'
-    domains = ['streamz.cc', 'streamz.vg', 'streamzz.to', 'streamz.ws']
-    pattern = r'(?://|\.)(streamzz?\.(?:cc|vg|to|ws))/([0-9a-zA-Z]+)'
+class DailyUploadsResolver(ResolveUrl):
+    name = 'DailyUploads'
+    domains = ['dailyuploads.net']
+    pattern = r'(?://|\.)(dailyuploads\.net)/([0-9A-Za-z]+)'
 
     def get_media_url(self, host, media_id):
-
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.CHROME_USER_AGENT}
+        headers = {'User-Agent': common.FF_USER_AGENT,
+                   'Referer': web_url}
         html = self.net.http_GET(web_url, headers=headers).content
+        if 'File Not Found' not in html:
+            data = helpers.get_hidden(html)
+            data.update(captcha_lib.do_captcha(html))
+            html = self.net.http_POST(web_url, data, headers=headers).content
+            r = re.search(r'<td.+?href="([^"]+)', html)
+            if r:
+                return urllib_parse.quote(r.group(1), '/:') + helpers.append_headers(headers)
 
-        if '<b>File not found, sorry!</b>' not in html:
-            html += helpers.get_packed_data(html)
-            v = re.search(r"player\s*=\s*.*?'([^']+)", html)
-            if v:
-                vurl = re.search(r'''{0}".+?src:\s*'([^']+)'''.format(v.group(1)), html)
-                if vurl:
-                    return helpers.get_redirect_url(vurl.group(1), headers) + helpers.append_headers(headers)
-
-        raise ResolverError('Video not found or removed')
+        raise ResolverError('File deleted')
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://streamzz.to/{media_id}')
+        return self._default_get_url(host, media_id, template='https://{host}/{media_id}')
+
+    @classmethod
+    def isPopup(self):
+        return True

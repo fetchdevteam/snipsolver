@@ -1,7 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2021 shellc0de
-                  2023 gujal
+    Copyright (C) 2024 gujal
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,33 +16,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from six.moves import urllib_parse
-from resolveurl.lib import helpers
+import binascii
+import re
 from resolveurl import common
+from resolveurl.lib import helpers
 from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class SendResolver(ResolveUrl):
-    name = 'Send'
-    domains = ['send.cm', 'sendit.cloud']
-    pattern = r'(?://|\.)(send(?:it)?\.(?:cm|cloud))/(?:f/embed/)?([0-9a-zA-Z]+)'
+class CloudFileResolver(ResolveUrl):
+    name = 'CloudFile'
+    domains = ['1cloudfile.com']
+    pattern = r'(?://|\.)(1cloudfile\.com)/([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.FF_USER_AGENT}
         html = self.net.http_GET(web_url, headers=headers).content
-        if "The file you were looking for doesn't exist." not in html:
-            data = helpers.get_hidden(html)
-            burl = 'https://{}'.format(host)
-            url = helpers.get_redirect_url(burl, headers=headers, form_data=data)
-            if url != burl:
-                headers.update({'Referer': web_url})
-                return urllib_parse.quote(url, '/:') + helpers.append_headers(headers)
-            else:
-                raise ResolverError('Unable to locate File')
-        else:
-            raise ResolverError('File deleted')
-        return
+        r = re.search(r'getNextDownloadPageLink\("([^"]+)', html)
+        if r:
+            source = ''.join([chr((x if isinstance(x, int) else ord(x)) ^ 117) for x in binascii.unhexlify(r.group(1))])
+            return source + helpers.append_headers(headers)
+        raise ResolverError('Video Link Not Found')
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://send.cm/{media_id}')
+        return self._default_get_url(host, media_id, 'https://{host}/{media_id}')
