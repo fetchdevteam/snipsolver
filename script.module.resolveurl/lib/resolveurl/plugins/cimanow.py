@@ -16,21 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from six.moves import urllib_parse
 from resolveurl.lib import helpers
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
 
 
-class LuluStreamResolver(ResolveGeneric):
-    name = 'LuluStream'
-    domains = ['lulustream.com', 'luluvdo.com', 'kinoger.pw']
-    pattern = r'(?://|\.)((?:lulu(?:stream|vdo)|kinoger)\.(?:com|pw))/(?:e/|d/)?([0-9a-zA-Z]+)'
+class CimaNowResolver(ResolveGeneric):
+    name = 'CimaNow'
+    domains = ['cimanowtv.com']
+    pattern = r'(?://)((?:[^\.]*\.)?cimanowtv\.com)/e/([0-9a-zA-Z$:/.]+)'
 
     def get_media_url(self, host, media_id):
+        if '$$' in media_id:
+            media_id, referer = media_id.split('$$')
+            referer = urllib_parse.urljoin(referer, '/')
+        else:
+            referer = False
         return helpers.get_media_url(
             self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{file:\s*["'](?P<url>[^"']+)'''],
+            patterns=[r'''<source\s*src="(?P<url>[^"]+).+?size="(?P<label>[^"]+)'''],
             generic_patterns=False,
-            referer=False
+            referer=referer,
+            ssl_verify=False,
+            verifypeer=False
         )
 
     def get_url(self, host, media_id):

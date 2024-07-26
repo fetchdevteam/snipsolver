@@ -1,6 +1,6 @@
 """
     Plugin for ResolveURL
-    Copyright (C) 2023 shellc0de
+    Copyright (C) 2024 MrDini123 (github.com/movieshark)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,18 +20,20 @@ from resolveurl.lib import helpers
 from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
 
 
-class LuluStreamResolver(ResolveGeneric):
-    name = 'LuluStream'
-    domains = ['lulustream.com', 'luluvdo.com', 'kinoger.pw']
-    pattern = r'(?://|\.)((?:lulu(?:stream|vdo)|kinoger)\.(?:com|pw))/(?:e/|d/)?([0-9a-zA-Z]+)'
+class AmdaHostResolver(ResolveGeneric):
+    name = 'AmdaHost'
+    domains = ['amdahost.com']
+    pattern = r'(?://|\.)(amdahost\.com)/watch(?:_direct)?.php\?id=([0-9a-zA-Z]+)'
 
-    def get_media_url(self, host, media_id):
+    def get_media_url(self, host, media_id, subs=False):
         return helpers.get_media_url(
             self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{file:\s*["'](?P<url>[^"']+)'''],
+            referer=True,
+            patterns=[r'''id="myVideo.+?data-src="(?P<url>[^"]+)''',
+                      r'''<source[^>]+?src="(?P<url>[^"]+)'''],
             generic_patterns=False,
-            referer=False
+            subs=subs
         )
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/e/{media_id}')
+        return self._default_get_url(host, media_id, template='https://www.{host}/watch.php?id={media_id}')

@@ -155,7 +155,7 @@ def parse_smil_source_list(smil):
     return sources
 
 
-def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, generic_patterns=True):
+def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, generic_patterns=True, url=None):
     if patterns is None:
         patterns = []
 
@@ -167,13 +167,13 @@ def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, ge
         for r in re.finditer(regex, _html, re.DOTALL):
             match = r.groupdict()
             stream_url = match['url']
-            if not (stream_url.startswith('http') or stream_url.startswith('//')):
-                try:
+            if not (stream_url.startswith('http') or stream_url.startswith('/')):
+                if re.search("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$", stream_url):
                     stream_url = b64decode(stream_url)
-                except:
-                    continue
             if stream_url.startswith('//'):
                 stream_url = scheme + ':' + stream_url
+            elif not stream_url.startswith('http'):
+                stream_url = urllib_parse.urljoin(url, stream_url)
             stream_url = stream_url.replace('&amp;', '&')
 
             file_name = urllib_parse.urlparse(stream_url[:-1]).path.split('/')[-1] if stream_url.endswith("/") else urllib_parse.urlparse(stream_url).path.split('/')[-1]
@@ -266,7 +266,8 @@ def get_media_url(
         url, result_blacklist=None, subs=False,
         patterns=None, generic_patterns=True,
         subs_patterns=None, generic_subs_patterns=True,
-        referer=True, redirect=True, verifypeer=True):
+        referer=True, redirect=True,
+        ssl_verify=True, verifypeer=True):
     if patterns is None:
         patterns = []
     if subs_patterns is None:
@@ -278,10 +279,9 @@ def get_media_url(
         result_blacklist = [result_blacklist]
 
     result_blacklist = list(set(result_blacklist + ['.smil']))  # smil(not playable) contains potential sources, only blacklist when called from here
-    net = common.Net()
+    net = common.Net(ssl_verify=ssl_verify)
     headers = {'User-Agent': common.RAND_UA}
-    u = urllib_parse.urlparse(url)
-    rurl = '{0}://{1}/'.format(u.scheme, u.netloc)
+    rurl = urllib_parse.urljoin(url, '/')
     if isinstance(referer, six.string_types):
         headers.update({'Referer': referer})
     elif referer:
@@ -295,8 +295,9 @@ def get_media_url(
     headers.update({'Referer': rurl, 'Origin': rurl[:-1]})
     if not verifypeer:
         headers.update({'verifypeer': 'false'})
-    source_list = scrape_sources(html, result_blacklist, scheme, patterns, generic_patterns)
-    source = (pick_source(source_list)).replace(' ', '%20') + append_headers(headers)
+    source_list = scrape_sources(html, result_blacklist, scheme, patterns, generic_patterns, rurl)
+    source = pick_source(source_list)
+    source = urllib_parse.quote(source, '/:?=&') + append_headers(headers)
     if subs:
         subtitles = scrape_subtitles(html, rurl, scheme, subs_patterns, generic_subs_patterns)
         return source, subtitles
@@ -804,4 +805,4 @@ def b64decode(t, binary=False):
 
 
 def b64encode(b):
-    return six.ensure_str(base64.b64encode(six.ensure_binary(b)))
+    return six.ensure_str(base64.b64encode(b if isinstance(b, bytes) else six.b(b)))

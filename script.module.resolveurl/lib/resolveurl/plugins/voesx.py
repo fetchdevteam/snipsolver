@@ -43,7 +43,9 @@ class VoeResolver(ResolveUrl):
                'valeronevijao.com', 'timberwoodanotia.com', 'apinchcaseation.com', 'nectareousoverelate.com',
                'nonesnanking.com', 'kathleenmemberhistory.com', 'stevenimaginelittle.com', 'jamiesamewalk.com',
                'bradleyviewdoctor.com', 'sandrataxeight.com', 'graceaddresscommunity.com', 'shannonpersonalcost.com',
-               'cindyeyefinal.com', 'michaelapplysome.com', 'sethniceletter.com']
+               'cindyeyefinal.com', 'michaelapplysome.com', 'sethniceletter.com', 'brucevotewithin.com',
+               'rebeccaneverbase.com', 'loriwithinfamily.com', 'roberteachfinal.com', 'erikcoldperson.com',
+               'jasminetesttry.com', 'heatherdiscussionwhen.com']
     domains += ['voeunblock{}.com'.format(x) for x in range(1, 11)]
     pattern = r'(?://|\.)((?:audaciousdefaulthouse|launchreliantcleaverriver|kennethofficialitem|' \
               r'reputationsheriffkennethsand|fittingcentermondaysunday|paulkitchendark|' \
@@ -52,7 +54,7 @@ class VoeResolver(ResolveUrl):
               r'realfinanceblogcenter|tinycat-voe-fashion|20demidistance9elongations|michaelapplysome|' \
               r'telyn610zoanthropy|toxitabellaeatrebates306|greaseball6eventual20|jayservicestuff|' \
               r'745mingiestblissfully|19turanosephantasia|30sensualizeexpression|sandrataxeight|' \
-              r'321naturelikefurfuroid|449unceremoniousnasoseptal|guidon40hyporadius9|' \
+              r'321naturelikefurfuroid|449unceremoniousnasoseptal|guidon40hyporadius9|brucevotewithin|' \
               r'cyamidpulverulence530|boonlessbestselling244|antecoxalbobbing1010|lukecomparetwo|' \
               r'matriculant401merited|scatch176duplicities|availedsmallest|stevenimaginelittle|' \
               r'counterclockwisejacky|simpulumlamerop|wolfdyslectic|nectareousoverelate|' \
@@ -60,6 +62,8 @@ class VoeResolver(ResolveUrl):
               r'yodelswartlike|figeterpiazine|strawberriesporail|valeronevijao|timberwoodanotia|' \
               r'generatesnitrosate|apinchcaseation|nonesnanking|kathleenmemberhistory|' \
               r'jamiesamewalk|bradleyviewdoctor|graceaddresscommunity|shannonpersonalcost|cindyeyefinal|' \
+              r'rebeccaneverbase|loriwithinfamily|roberteachfinal|erikcoldperson|jasminetesttry|' \
+              r'heatherdiscussionwhen|' \
               r'(?:v-?o-?e)?(?:-?un-?bl[o0]?c?k\d{0,2})?(?:-?voe)?)\.(?:sx|com|net))/' \
               r'(?:e/)?([0-9A-Za-z]+)'
 
@@ -67,6 +71,12 @@ class VoeResolver(ResolveUrl):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.RAND_UA}
         html = self.net.http_GET(web_url, headers=headers).content
+        if 'const currentUrl' in html:
+            r = re.search(r'''window\.location\.href\s*=\s*'([^']+)''', html)
+            if r:
+                web_url = r.group(1)
+                html = self.net.http_GET(web_url, headers=headers).content
+
         if subs:
             subtitles = helpers.scrape_subtitles(html, web_url)
 
