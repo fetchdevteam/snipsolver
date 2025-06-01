@@ -30,7 +30,7 @@ class SuperVideoResolver(ResolveUrl):
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.FF_USER_AGENT,
-                   'Referer': 'https://{0}/'.format(host), 'verifypeer: 'false'}
+                   'Referer': 'https://{0}/'.format(host), 'verifypeer': 'false'}
         html = self.net.http_GET(web_url, headers=headers).content
 
         pdata = helpers.get_packed_data(html)
